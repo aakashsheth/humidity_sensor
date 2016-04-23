@@ -33,14 +33,16 @@ def test():
 #######################################################
 
 # Get the current humidity
-@app.route("/humdity_sensor", methods=['GET'])
+@app.route("/humidity_sensor", methods=['GET'])
 def getHumiditySensor():
-
-        # Get the humidity sensor reading
+        
+	
+	# Get the humidity sensor reading
         reading = myDHT22.getHumidity()
-
+	print(reading['humidity'])
         current_humidity = reading['humidity']
         current_temp = reading['temp']
+	print(reading)
 
         data = {
                 'status' : '',
@@ -52,7 +54,8 @@ def getHumiditySensor():
                 data['status'] = 'success'
                 data['current_humidity'] = current_humidity
                 data['current_temp'] = current_temp
-                return flask.jsonify(data)
+		print("Data: %s", str(data)) 
+                return str(data)
 
 
         data['current_humidity'] = "null"
@@ -60,15 +63,17 @@ def getHumiditySensor():
         data['status'] = "fail"
         data['error'] = "Unable to read from sensor"
         
-        return flask.jsonify(data)
+        return str(data)
 
         
 
-@app.route("/humidity_change_setting", methods=['POST'])
-def setCurrentHumidity():
+@app.route("/change_humidity_setting/<setting>", methods=['POST'])
+def setCurrentHumidity(setting):
         
         # Set new value
-        value = request.form['value']
+	value = setting
+	print("value", value)
+
         current_humidity_setting = ''
         
         try:
@@ -80,11 +85,11 @@ def setCurrentHumidity():
 
                 current_humidity_setting = value
 
-                data = {
-                        'status' : 'success',
-                        'current_humidity_setting' : current_humidity_setting,
-                }
-                return flask.jsonify(data)
+                data = { 
+			'status' : 'success',
+			'current_humidity_setting' : str(current_humidity_setting)
+		}
+                return str(data)
                 
         except Exception:
                 return flask.jsonify({
@@ -118,7 +123,36 @@ def getCurrentHumiditySetting():
                         'message' : 'Could not read from file'
                 })
 
+# User updated on/off
+@app.route("/user_state/<state>", methods=['POST'])
+def setUserState(state):
+
+        # Set new value
+	value = state
+
+        try:
+                myFile = open('user_state', 'w')
+                myFile.truncate()
+
+                myFile.write(value)
+                myFile.close()
+
+                current_user_state = value
+
+                data = { 
+			'status' : 'success',
+			'current_user_state' : str(current_user_state)
+		}
+                return str(data)
                 
+        except Exception:
+                return flask.jsonify({
+                        'status' : 'failure',
+                        'message' : 'Could not write user_state to file'
+                })
+
+
+ 
 # Get current state of humidifier
 @app.route("/state", methods=['GET'])
 def getCurrentState():
