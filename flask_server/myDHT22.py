@@ -1,6 +1,5 @@
 import Adafruit_DHT as dht
 import datetime
-from datetime import datetime
 
 #reading interval in seconds.
 reading_interval = 3
@@ -11,7 +10,9 @@ prev_time = "00000099"
 
 def getHumidity():
     h,t = dht.read_retry(dht.DHT22, 4)
+    now = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
     ret = {
+        'datetime' : now,
         'humidity' : h,
         'temp' : t
     }
