@@ -2,7 +2,6 @@ from flask import Flask, request
 import RPi.GPIO as GPIO
 import time
 import myDHT22
-import publish_ip
 
 # GPIO Settings
 GPIO.setmode(GPIO.BCM)
@@ -184,6 +183,7 @@ def getCurrentState():
 
 
 if __name__ == "__main__":
-	#app.run(processes=3)
+	
+#app.run(processes=3)
         app.run(host='0.0.0.0', processes=3)
         print("Succesfully launched!")
