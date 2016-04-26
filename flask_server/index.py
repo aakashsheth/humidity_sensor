@@ -2,7 +2,12 @@ from flask import Flask, request
 import RPi.GPIO as GPIO
 import time
 import myDHT22
+
 import publish_ip
+import AutoHumidity
+
+seconds_between_checks = 10
+AutoHumidity.begin_automation(seconds_between_checks)
 
 # GPIO Settings
 GPIO.setmode(GPIO.BCM)
@@ -11,20 +16,7 @@ GPIO.setwarnings(False)
 # Set PIN 18 as output 
 GPIO.setup(18, GPIO.OUT)
 
-
 app = Flask(__name__)
-
-# Sample test to see if I could the LED to light up
-##@app.route("/<action>")
-##def on(action):
-##        if action == "on":
-##                GPIO.output(18, GPIO.HIGH)
-##                return "LED IS ON!"
-##
-##@app.route("/off")
-##def off():
-##        GPIO.output(18, GPIO.LOW)
-##        return "LED is OFF!"
 
 @app.route("/test", methods=['GET'])
 def test():
@@ -34,7 +26,7 @@ def test():
 #######################################################
 
 # Get the current humidity
-@app.route("/humidity_sensor", methods=['GET'])
+@app.route("/humidity_sensor", methods=['GET','POST'])
 def getHumiditySensor():
         
 	
@@ -107,17 +99,15 @@ def setCurrentHumidity(setting):
 
 
 # Get the current humidity setting
-@app.route("/humidity_setting", methods=['GET'])
+@app.route("/humidity_setting", methods=['GET','POST'])
 def getCurrentHumiditySetting():
 
         print ("Get Humidity Setting....")
         # Get the current humidity setting
         try:
                 myFile = open('settings', 'r')
-                print ("Get Humidity Setting....2")
                 #value = myFile.readLine()#Aakash, it's not readLine, but readline
                 value = myFile.readline()
-                print ("Get Humidity Setting....3")
                 myFile.close()
 
                 current_humidity_setting = value
@@ -132,7 +122,7 @@ def getCurrentHumiditySetting():
                 return "{'status' : 'failure','message' : 'Could not read from file'})"
 
 # User updated on/off
-@app.route("/user_state/<state>", methods=['GET'])
+@app.route("/user_state/<state>", methods=['GET','POST'])
 def setUserState(state):
 
         # Set new value
@@ -159,7 +149,7 @@ def setUserState(state):
 
  
 # Get current state of humidifier
-@app.route("/state", methods=['GET'])
+@app.route("/state", methods=['GET','POST'])
 def getCurrentState():
 
 
@@ -180,7 +170,27 @@ def getCurrentState():
                 
         except Exception:
                 return "{'status' : 'failure','message' : 'Could not read humidifier state from file'})"
-        
+
+# Display all current settings
+@app.route("/all_settings", methods=['GET','POST'])
+def getAllSettings():
+
+        myFile = open('user_state', 'r')
+        state = myFile.readline()
+        to_show =       "System State: "+state
+        myFile.close()
+
+        myFile = open('state', 'r')
+        state = myFile.readline()
+        to_show +=      "<br>Humidifier State: "+state
+        myFile.close()
+
+        myFile = open('settings', 'r')
+        value = myFile.readline()
+        to_show +=      "<br>Humidity Setting: "+value
+        myFile.close()
+
+        return to_show
 
 
 if __name__ == "__main__":
