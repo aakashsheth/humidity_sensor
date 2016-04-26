@@ -3,10 +3,12 @@ import RPi.GPIO as GPIO
 import time
 import myDHT22
 
+import file_manager as files
 import publish_ip
 import AutoHumidity
 
-seconds_between_checks = 10
+# Begin automation logic script
+seconds_between_checks = 5
 AutoHumidity.begin_automation(seconds_between_checks)
 
 # GPIO Settings
@@ -75,12 +77,8 @@ def setCurrentHumidity(setting):
         current_humidity_setting = ''
         
         try:
-                myFile = open('settings', 'w')
-                myFile.truncate()
-
-                myFile.write(value)
-                myFile.close()
-
+                files.writeSettings(value)
+                AutoHumidity.perform_check(-1)
                 current_humidity_setting = value
 
                 data = { 
@@ -105,10 +103,7 @@ def getCurrentHumiditySetting():
         print ("Get Humidity Setting....")
         # Get the current humidity setting
         try:
-                myFile = open('settings', 'r')
-                #value = myFile.readLine()#Aakash, it's not readLine, but readline
-                value = myFile.readline()
-                myFile.close()
+                value = files.readSettings()
 
                 current_humidity_setting = value
 
@@ -129,11 +124,7 @@ def setUserState(state):
 	value = state
 
         try:
-                myFile = open('user_state', 'w')
-                myFile.truncate()
-
-                myFile.write(value)
-                myFile.close()
+                files.writeUserState(value)
 
                 current_user_state = value
 
@@ -160,9 +151,7 @@ def getCurrentState():
         
         # Get the status, on or off
         try:
-                myFile = open('state', 'r')
-                state = myFile.readline()
-                myFile.close()
+                state = files.readState()
 
                 data['status'] = 'success'
                 data['humidifier_state'] = state
@@ -175,20 +164,14 @@ def getCurrentState():
 @app.route("/all_settings", methods=['GET','POST'])
 def getAllSettings():
 
-        myFile = open('user_state', 'r')
-        state = myFile.readline()
-        to_show =       "System State: "+state
-        myFile.close()
+        user_state = files.readUserState()
+        to_show =       "System State: "+user_state
 
-        myFile = open('state', 'r')
-        state = myFile.readline()
+        state = files.readState()
         to_show +=      "<br>Humidifier State: "+state
-        myFile.close()
 
-        myFile = open('settings', 'r')
-        value = myFile.readline()
+        value = files.readSettings()
         to_show +=      "<br>Humidity Setting: "+value
-        myFile.close()
 
         return to_show
 
