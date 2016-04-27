@@ -1,36 +1,37 @@
+path = "/home/pi/486/humidity_sensor/flask_server/"
 
 def readSettings():
-    myFile = open('settings', 'r')
+    myFile = open(path+'settings', 'r')
     value = myFile.readline()
     myFile.close()
     return value
 
 def writeSettings(value):    
-    myFile = open('settings', 'w')
+    myFile = open(path+'settings', 'w')
     myFile.truncate()
     myFile.write(value)
     myFile.close()
 
 def readState():
-    myFile = open('state', 'r')
+    myFile = open(path+'state', 'r')
     value = myFile.readline()
     myFile.close()
     return value
 
 def writeState(value):    
-    myFile = open('state', 'w')
+    myFile = open(path+'state', 'w')
     myFile.truncate()
     myFile.write(value)
     myFile.close()
 
 def readUserState():
-    myFile = open('user_state', 'r')
+    myFile = open(path+'user_state', 'r')
     value = myFile.readline()
     myFile.close()
     return value
 
 def writeUserState(value):    
-    myFile = open('user_state', 'w')
+    myFile = open(path+'user_state', 'w')
     myFile.truncate()
     myFile.write(value)
     myFile.close()

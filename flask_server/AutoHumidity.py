@@ -18,6 +18,9 @@ def perform_check(interval):
 
     # if user_state is not set to "on", we don't need to do anything
     user_state = files.readUserState()
+    if user_state != "on" and interval == -2:
+	turn_humidifier_off()
+	return
     if user_state != "on":
         print ("\tUser state: '" + user_state+"'")
         print ("\tNot on, so doing nothing...")
@@ -39,22 +42,18 @@ def perform_check(interval):
 
     #if it's on and the current humidity is more than the setting, turn off.
     if state == 'on' and humid >= setting:
-        print ("   Turning OFF...")
-        relay.turn_off()
-        files.writeState("off")
+        turn_humidifier_off()
 
     #if it's not on and the humidity is less than the setting (minus accuracy), turn on
     elif state != 'on' and humid < (setting-humidity_accuracy):
-        print ("   Turning ON...")
-        relay.turn_on()
-        files.writeState("on")
+    	turn_humidifier_on()
 
     #otherwise, all is well.
     else:
         print ("   All is well, leaving the device "+state)
 
     if interval <= 0:
-        print ("~~~~~ Modification check was just performed ~~~~~")
+        print ("\t~~ Modification check was just performed ~~")
         return
     
     Timer(interval, perform_check, [interval]).start()
@@ -62,3 +61,13 @@ def perform_check(interval):
 def begin_automation(interval):
     print ("------ Starting automation script with "+str(interval)+" sec. intervals...")
     thread.start_new_thread(perform_check, (interval,))
+
+def turn_humidifier_off():
+	print("~~~ Turning system OFF ~~~")
+        relay.turn_off()
+        files.writeState("off")
+
+def turn_humidifier_on():
+	print("~~~ Turning system ON ~~~")
+        relay.turn_on()
+        files.writeState("on")
