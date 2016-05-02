@@ -1,5 +1,10 @@
 import urllib
+
 ip = urllib.urlopen('http://arlenburroughs.com/ip.php').read()
+
+#override public ip detection by putting in local ip...
+ip = "192.168.43.218"
+
 print ("------ Publishing Pi's IP to DB ------")
 print ("Public IP: '"+ip+"'")
 

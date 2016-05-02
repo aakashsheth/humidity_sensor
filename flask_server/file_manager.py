@@ -35,3 +35,15 @@ def writeUserState(value):
     myFile.truncate()
     myFile.write(value)
     myFile.close()
+
+def readHumidity():
+    myFile = open(path+'humidity', 'r')
+    value = myFile.readline()
+    myFile.close()
+    return value
+
+def writeHumidity(value):
+    myFile = open(path+'humidity', 'w')
+    myFile.truncate()
+    myFile.write(str(value))
+    myFile.close()

@@ -1,5 +1,6 @@
 import Adafruit_DHT as dht
 import datetime
+import file_manager as files
 
 #reading interval in seconds.
 reading_interval = 3
@@ -8,16 +9,26 @@ num_readings = 1
 i=0
 prev_time = "00000099"
 
-def getHumidity():
-    h,t = dht.read_retry(dht.DHT22, 4)
-    now = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-    ret = {
-        'datetime' : now,
-        'humidity' : h,
-        'temp' : t
-    }
+def getHumidity(type):
+	read_file = 1
+	read_sensor = 0
+	if type == read_file:
+		print ("      Reading Humidity from FILE")
+		h = files.readHumidity()
+		t = -1
+	elif type == read_sensor:
+		print ("      Reading Humidity from SENSOR")
+		h,t = dht.read_retry(dht.DHT22, 4)
 
-    return ret
+    	now = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
+    	
+	ret = {
+       		'datetime' : now,
+       		'humidity' : h,
+       		'temp' : t
+    	}
+
+	return ret
 
 
 ##while (i<num_readings):

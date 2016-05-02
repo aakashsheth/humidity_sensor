@@ -8,7 +8,7 @@ import publish_ip
 import AutoHumidity
 
 # Begin automation logic script
-seconds_between_checks = 10
+seconds_between_checks = 4
 AutoHumidity.begin_automation(seconds_between_checks)
 
 # GPIO Settings
@@ -33,7 +33,7 @@ def getHumiditySensor():
         
 	
 	# Get the humidity sensor reading
-        reading = myDHT22.getHumidity()
+        reading = myDHT22.getHumidity(1)
 	print(reading['humidity'])
 	time = reading['datetime']
         current_humidity = reading['humidity']
@@ -172,7 +172,7 @@ def getAllSettings():
         value = files.readSettings()
         to_show +=      "<br>Humidity Setting:\t"+value
 
-        reading = myDHT22.getHumidity()
+        reading = myDHT22.getHumidity(1)
 	hum = reading['humidity']
 	to_show +=	"<br>Current Humidity:\t"+str(hum)
 

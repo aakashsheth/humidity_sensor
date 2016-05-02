@@ -10,7 +10,7 @@ import file_manager as files
 
 # the accuracy of the humidity
 # (i.e. '2' will guarantee a humidity between 38 and 40 for a setting of 40%)
-humidity_accuracy = 2
+humidity_accuracy = 0
 
 def perform_check(interval):
 
@@ -21,11 +21,6 @@ def perform_check(interval):
     if user_state != "on" and interval == -2:
 	turn_humidifier_off()
 	return
-    if user_state != "on":
-        print ("\tUser state: '" + user_state+"'")
-        print ("\tNot on, so doing nothing...")
-        Timer(interval, perform_check, [interval]).start()
-        return
 
     system = files.readUserState()
     print ("\tUser state : "+system)
@@ -33,12 +28,20 @@ def perform_check(interval):
     state = files.readState()
     print ("\tMach. State: "+state)
 
-    reading = myDHT22.getHumidity()
+    reading = myDHT22.getHumidity(0)
     humid = reading['humidity']
+    files.writeHumidity(humid)
     print ("\tCurrent Hum: "+str(humid))
 
     setting = float(files.readSettings())
     print ("\tDesired    : "+str(setting))
+
+
+    if user_state != "on":
+        print ("\tUser state: '" + user_state+"'")
+        print ("\tNot on, so doing nothing...")
+	Timer(interval, perform_check, [interval]).start()
+	return
 
     #if it's on and the current humidity is more than the setting, turn off.
     if state == 'on' and humid >= setting:
