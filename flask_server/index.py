@@ -1,22 +1,23 @@
-from flask import Flask, request
-import RPi.GPIO as GPIO
+from flask import Flask, request, render_template, jsonify
+# import RPi.GPIO as GPIO
 import time
-import myDHT22
+from random import randint
+# import myDHT22
 
-import file_manager as files
+# import file_manager as files
 import publish_ip
-import AutoHumidity
+# import AutoHumidity
 
 # Begin automation logic script
-seconds_between_checks = 4
-AutoHumidity.begin_automation(seconds_between_checks)
+# seconds_between_checks = 4
+# AutoHumidity.begin_automation(seconds_between_checks)
 
 # GPIO Settings
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+# GPIO.setmode(GPIO.BCM)
+# GPIO.setwarnings(False)
 
 # Set PIN 18 as output 
-GPIO.setup(18, GPIO.OUT)
+# GPIO.setup(18, GPIO.OUT)
 
 app = Flask(__name__)
 
@@ -25,166 +26,209 @@ def test():
 	data = "{'status': 'It works'}"
        	return data
 
+
+
+
+#######################################################
+# Homepage routes
+# I could have made the home page use the existing routes
+# that the Android app uses, but since its working fine
+# I'd rather not touch it. These are the routes for
+# the AJAX calls for the homepage
+
+@app.route("/homepage", methods=['GET'])
+# @app.route("/homepage/<name>", methods=['GET'])
+def homepage(name=None):
+    return render_template('index.html', name=name)
+
+@app.route('/data', methods=['GET'])
+def data():
+    
+    # Get the readings
+    #reading = myDHT22.getHumidity(1)
+
+    # Check if it worked
+    # if reading:
+
+    #     try:
+    #         value = files.readSettings()
+
+    #         return jsonify(
+    #             current_humidity=reading['current_humidity'],
+    #             current_temp=reading['current_temp'],
+    #             current_status='ON',
+    #             current_setting=value)
+
+    # return jsonify(error="Could not get reading");
+    # return jsonify(current_humidity=reading['current_humidity'],current_temp=reading['current_temp'])
+    
+    return jsonify(
+        current_humidity=50,
+        current_temp=72,
+        current_setting=82,
+        current_status='ON',
+        ip='10.241.135.215',)
+
 #######################################################
 
 # Get the current humidity
-@app.route("/humidity_sensor", methods=['GET','POST'])
-def getHumiditySensor():
+# @app.route("/humidity_sensor", methods=['GET','POST'])
+# def getHumiditySensor():
         
 	
-	# Get the humidity sensor reading
-        reading = myDHT22.getHumidity(1)
-	print(reading['humidity'])
-	time = reading['datetime']
-        current_humidity = reading['humidity']
-        current_temp = reading['temp']
-	print(reading)
+# 	# Get the humidity sensor reading
+#         reading = myDHT22.getHumidity(1)
+# 	print(reading['humidity'])
+# 	time = reading['datetime']
+#         current_humidity = reading['humidity']
+#         current_temp = reading['temp']
+# 	print(reading)
 
-        data = {
-                'status' : '',
-                'time' : '',
-                'current_humidity' : '',
-                'current_temp' : '',
-        }
+        # data = {
+        #         'status' : '',
+        #         'time' : '',
+        #         'current_humidity' : '',
+        #         'current_temp' : '',
+        # }
 
-        if(reading):
-                data['status'] = 'success'
-                data['time'] = time
-                data['current_humidity'] = current_humidity
-                data['current_temp'] = current_temp
-		print("Data:", str(data)) 
-                return str(data)
+#         if(reading):
+#                 data['status'] = 'success'
+#                 data['time'] = time
+#                 data['current_humidity'] = current_humidity
+#                 data['current_temp'] = current_temp
+# 		print("Data:", str(data)) 
+#                 return str(data)
 
 
-        data['current_humidity'] = "null"
-        data['current_temp'] = "null"
-        data['status'] = "fail"
-        data['time'] = time
-        data['error'] = "Unable to read from sensor"
+#         data['current_humidity'] = "null"
+#         data['current_temp'] = "null"
+#         data['status'] = "fail"
+#         data['time'] = time
+#         data['error'] = "Unable to read from sensor"
         
-        return str(data)
+#         return str(data)
 
         
 
-@app.route("/change_humidity_setting/<setting>", methods=['GET', 'POST'])
-def setCurrentHumidity(setting):
+# @app.route("/change_humidity_setting/<setting>", methods=['GET', 'POST'])
+# def setCurrentHumidity(setting):
 
-        print ("Change humidity settings....")
-        # Set new value
-	value = setting
-	print("value", value)
+#         print ("Change humidity settings....")
+#         # Set new value
+# 	value = setting
+# 	print("value", value)
 
-        current_humidity_setting = ''
+#         current_humidity_setting = ''
         
-        try:
-                files.writeSettings(value)
-                AutoHumidity.perform_check(-1)
-                current_humidity_setting = value
+#         try:
+#                 files.writeSettings(value)
+#                 AutoHumidity.perform_check(-1)
+#                 current_humidity_setting = value
 
-                data = { 
-			'status' : 'success',
-			'current_humidity_setting' : str(current_humidity_setting)
-		}
-                return str(data)
+#                 data = { 
+# 			'status' : 'success',
+# 			'current_humidity_setting' : str(current_humidity_setting)
+# 		}
+#                 return str(data)
                 
-        except Exception:
-                data = {
-                        'status' : 'failure',
-                        'message' : 'Could not write to file'
-                }
-        return str(data)
+#         except Exception:
+#                 data = {
+#                         'status' : 'failure',
+#                         'message' : 'Could not write to file'
+#                 }
+#         return str(data)
                 
 
-# Get the current humidity setting
-@app.route("/humidity_setting", methods=['GET','POST'])
-def getCurrentHumiditySetting():
+# # Get the current humidity setting
+# @app.route("/humidity_setting", methods=['GET','POST'])
+# def getCurrentHumiditySetting():
 
-        print ("Get Humidity Setting....")
-        # Get the current humidity setting
-        try:
-                value = files.readSettings()
+#         print ("Get Humidity Setting....")
+#         # Get the current humidity setting
+#         try:
+#                 value = files.readSettings()
 
-                current_humidity_setting = value
+#                 current_humidity_setting = value
 
-                data = {
-                        'status' : 'success',
-                        'current_humidity_setting' : current_humidity_setting,
-                }
-                return str(data)
+#                 data = {
+#                         'status' : 'success',
+#                         'current_humidity_setting' : current_humidity_setting,
+#                 }
+#                 return str(data)
                 
-        except Exception:
-                return "{'status' : 'failure','message' : 'Could not read from file'})"
+#         except Exception:
+#                 return "{'status' : 'failure','message' : 'Could not read from file'})"
 
-# User updated on/off
-@app.route("/user_state/<state>", methods=['GET','POST'])
-def setUserState(state):
+# # User updated on/off
+# @app.route("/user_state/<state>", methods=['GET','POST'])
+# def setUserState(state):
 
-        # Set new value
-	value = state
+#         # Set new value
+# 	value = state
 
-        try:
-                files.writeUserState(value)
-		AutoHumidity.perform_check(-2)
-                current_user_state = value
+#         try:
+#                 files.writeUserState(value)
+# 		AutoHumidity.perform_check(-2)
+#                 current_user_state = value
 
-                data = { 
-			'status' : 'success',
-			'current_user_state' : str(current_user_state)
-		}
-                return str(data)
+#                 data = { 
+# 			'status' : 'success',
+# 			'current_user_state' : str(current_user_state)
+# 		}
+#                 return str(data)
                 
-        except Exception:
-                return "{'status' : 'failure','message' : 'Could not write user_state from file'})"
+#         except Exception:
+#                 return "{'status' : 'failure','message' : 'Could not write user_state from file'})"
 
 
  
-# Get current state of humidifier
-@app.route("/user_state", methods=['GET','POST'])
-def getCurrentState():
+# # Get current state of humidifier
+# @app.route("/user_state", methods=['GET','POST'])
+# def getCurrentState():
 
 
-        data = {
-                'status' : '',
-                'current_user_state' : '',
-        }
+#         data = {
+#                 'status' : '',
+#                 'current_user_state' : '',
+#         }
         
-        # Get the status, on or off
-        try:
-                state = files.readUserState()
+#         # Get the status, on or off
+#         try:
+#                 state = files.readUserState()
 
-                data['status'] = 'success'
-                data['current_user_state'] = state
-                return str(data)
+#                 data['status'] = 'success'
+#                 data['current_user_state'] = state
+#                 return str(data)
                 
-        except Exception:
-                return "{'status' : 'failure','message' : 'Could not read humidifier state from file'})"
+#         except Exception:
+#                 return "{'status' : 'failure','message' : 'Could not read humidifier state from file'})"
 
-# Display all current settings
-@app.route("/all_settings", methods=['GET','POST'])
-def getAllSettings():
+# # Display all current settings
+# @app.route("/all_settings", methods=['GET','POST'])
+# def getAllSettings():
 
-        user_state = files.readUserState()
-        to_show =       "User State:\t"+user_state
+#         user_state = files.readUserState()
+#         to_show =       "User State:\t"+user_state
 
-        state = files.readState()
-        to_show +=      "<br>Humidifier State:\t"+state
+#         state = files.readState()
+#         to_show +=      "<br>Humidifier State:\t"+state
 
-        value = files.readSettings()
-        to_show +=      "<br>Humidity Setting:\t"+value
+#         value = files.readSettings()
+#         to_show +=      "<br>Humidity Setting:\t"+value
 
-        reading = myDHT22.getHumidity(1)
-	hum = reading['humidity']
-	to_show +=	"<br>Current Humidity:\t"+str(hum)
+#         reading = myDHT22.getHumidity(1)
+# 	hum = reading['humidity']
+# 	to_show +=	"<br>Current Humidity:\t"+str(hum)
 
-	data = {
-                'status' : 'success',
-                'current_state' : state,
-                'current_user_state' : user_state,
-                'current_humidity_setting' : value,
-                'current_humidity' : hum,
-        }
+# 	data = {
+#                 'status' : 'success',
+#                 'current_state' : state,
+#                 'current_user_state' : user_state,
+#                 'current_humidity_setting' : value,
+#                 'current_humidity' : hum,
+#         }
 
-	return str(data)
+# 	return str(data)
 
 
 if __name__ == "__main__":
