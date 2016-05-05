@@ -1,9 +1,12 @@
 import urllib
 
-ip = urllib.urlopen('http://arlenburroughs.com/ip.php').read()
+#get's public ip address
+#ip = urllib.urlopen('http://arlenburroughs.com/ip.php').read()
 
-#override public ip detection by putting in local ip...
-ip = "192.168.43.218"
+#get local IP address
+import netifaces as ni
+ni.ifaddresses("eth0")
+ip = ni.ifaddresses("eth0")[2][0]["addr"]
 
 print ("------ Publishing Pi's IP to DB ------")
 print ("Public IP: '"+ip+"'")
