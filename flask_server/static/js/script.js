@@ -1,6 +1,5 @@
 $(function(){
 
-
 	var onlineStatus = $("#header_status");
 	var onButton = $("#turn_on");
 	var offButton = $("#turn_off");
@@ -9,7 +8,37 @@ $(function(){
 
 	onButton.hide()
 	offButton.hide()
+	
+	// Get the data the firs time the server runs
+	
+		$.ajax({
+			url: "/data",
+			success: function(result){
+				console.log(result);
+				
+				// Add two random numbers for each dataset
+				myLiveChart.addData([result['current_humidity'],result['current_temp']], ++latestLabel);
+				// Remove the first point so we dont just add values forever
+				myLiveChart.removeData();
 
+				// Update the UI
+				$('#current_setting').html(result['current_setting']);
+				$('#localIP').html(result['current_ip']);
+				if(result['current_status'] === 'ON')
+				{
+					onlineStatus.css('color', 'green');
+					onButton.hide()
+					offButton.show()
+				}
+				else {
+					onlineStatus.css('color', 'red');
+					onButton.show()
+					offButton.hide()
+				}
+
+				//$('#localIP').html(result['ip']);
+			}
+		})
 	var canvas = document.getElementById('myChart'),
     ctx = canvas.getContext('2d'),
     startingData = {
@@ -67,7 +96,7 @@ $(function(){
 					offButton.hide()
 				}
 
-				$('#localIP').html(result['ip']);
+				//$('#localIP').html(result['ip']);
 			}
 		})
 	}
@@ -101,7 +130,7 @@ $(function(){
 		var url = "/change_humidity_setting/" + humidity_amount.val()
 
 		$.ajax({
-			url: url
+			url: url,
 			success: function(result){
 				console.log(result);
 			}
