@@ -7,7 +7,7 @@ By:
 
 
 To Start Server, enter this command on the Raspberry Pi: 
-sudo python index.py
+sudo python <path to sourcecode>/humidity_sensor/flask_server/index.py
 The server is supposed to launch automatically upon booting, but a problem with network connectivity may cause issues.
 
 
