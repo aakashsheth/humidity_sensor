@@ -6,4 +6,8 @@ By:
    Brad Patras
 
 
-To Start Server: python index.py
+To Start Server: sudo python index.py
+
+IP should be given when server starts and logger displays IP.
+
+See index.py for API requirements
