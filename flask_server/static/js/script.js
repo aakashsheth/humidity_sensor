@@ -51,14 +51,14 @@ $(function(){
 				pointStrokeColor: "#fff",
 				data: [65, 59, 80, 81, 56, 55, 40]
 			},
-        	{
+        /*	{
               fillColor: "rgba(220,220,220,0.2)",
               strokeColor: "rgba(220,220,220,1)",
               pointColor: "rgba(220,220,220,1)",
               pointStrokeColor: "#fff",
               data: [65, 59, 80, 81, 56, 55, 40]
           	}
-        ]
+       */ ]
     },
     latestLabel = startingData.labels[6];
 
@@ -68,7 +68,7 @@ $(function(){
 
 	setInterval(function(){
 		getData();	  
-	}, 5000);
+	}, 1000);
 
 	function getData(){
 		$.ajax({
@@ -77,14 +77,14 @@ $(function(){
 				console.log(result);
 				
 				// Add two random numbers for each dataset
-				myLiveChart.addData([result['current_humidity'],result['current_temp']], ++latestLabel);
+				myLiveChart.addData([result['current_humidity']], ++latestLabel);
 				// Remove the first point so we dont just add values forever
 				myLiveChart.removeData();
 
 				// Update the UI
 				$('#current_setting').html(result['current_humidity_setting']);
 				
-				if(result['current_status'] === 'ON')
+				if(result['current_state'] == 'on')
 				{
 					onlineStatus.css('color', 'green');
 					onButton.hide()
@@ -103,11 +103,11 @@ $(function(){
 
 	onButton.on('click', function(){
 		// Send AJAX ON request
-		alert("ON Button clicked");
 
 		$.ajax({
 			url: "/user_state/on",
 			success: function(result){
+				console.log('Turning on');
 				console.log(result);
 			}
 		})
@@ -115,7 +115,6 @@ $(function(){
 
 	offButton.on('click', function(){
 		// Send AJAX OFF request
-		alert("OFF Button clicked");
 
 		$.ajax({
 			url: "/user_state/off",
@@ -127,12 +126,13 @@ $(function(){
 
 	setButton.on('click', function(){
 		// Set the humidity to the desired setting
-		var url = "/change_humidity_setting/" + humidity_amount.val()
-
+		var url = "/change_humidity_setting/" + humidityAmount.val()
+		
 		$.ajax({
 			url: url,
 			success: function(result){
 				console.log(result);
+				console.log(url);
 			}
 		})
 	});

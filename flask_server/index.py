@@ -130,11 +130,14 @@ def setUserState(state):
         AutoHumidity.perform_check(-2)
         current_user_state = value
 
-        data = {
-            'status': 'success',
-            'current_user_state': str(current_user_state)
-        }
-        return str(data)
+        #data = {
+        #    'status': 'success',
+        #    'current_user_state': str(current_user_state)
+        #}
+        return jsonify(
+            status = 'success',
+            current_user_state = str(current_user_state),
+        )
 
     except Exception:
         return "{'status' : 'failure','message' : 'Could not write user_state from file'})"
@@ -176,6 +179,8 @@ def getAllSettings():
     hum = reading['humidity']
     to_show += "<br>Current Humidity:\t" + str(hum)
 
+    ni.ifaddresses('eth0')
+    ip = ni.ifaddresses('eth0')[2][0]['addr']
 
     return jsonify(   
         status = 'success',
@@ -183,7 +188,8 @@ def getAllSettings():
         current_user_state = user_state,
         current_humidity_setting = int(value),
         current_humidity = int(float(hum)),
-        current_temp = 0,
+        current_temp = reading['temp'],
+        current_ip = ip,
     )
 
 
