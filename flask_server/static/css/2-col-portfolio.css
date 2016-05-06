@@ -16,6 +16,10 @@ footer {
     margin: 50px 0;
 }
 
+#current_humidity_reading {
+	font-size: 80px;
+}
+
 #current_setting {
 	font-size: 80px;
 }

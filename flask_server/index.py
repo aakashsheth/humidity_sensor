@@ -10,7 +10,7 @@ import AutoHumidity
 
 # Begin automation logic script
 seconds_between_checks = 4
-#AutoHumidity.begin_automation(seconds_between_checks)
+AutoHumidity.begin_automation(seconds_between_checks)
 
 # GPIO Settings
 GPIO.setmode(GPIO.BCM)

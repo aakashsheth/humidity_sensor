@@ -6,44 +6,18 @@ $(function(){
 	var setButton = $('#set_button');
 	var humidityAmount = $('#humidity_amount');
 
-	onButton.hide()
-	offButton.hide()
+	var intervalId = setInterval(function(){
+		getData();	  
+	}, 1000);
 	
 	// Get the data the firs time the server runs
 	getData();
-		/*$.ajax({
-			url: "/all_settings",
-			success: function(result){
-				console.log(result);
-				
-				// Add two random numbers for each dataset
-				myLiveChart.addData([result['current_humidity'],result['current_temp']], ++latestLabel);
-				// Remove the first point so we dont just add values forever
-				myLiveChart.removeData();
-
-				// Update the UI
-				$('#current_setting').html(result['current_humidity_setting']);
-				$('#localIP').html(result['current_ip']);
-				if(result['current_status'] === 'ON')
-				{
-					onlineStatus.css('color', 'green');
-					onButton.hide()
-					offButton.show()
-				}
-				else {
-					onlineStatus.css('color', 'red');
-					onButton.show()
-					offButton.hide()
-				}
-
-				//$('#localIP').html(result['ip']);
-			}
-		}) */
+	
 	var canvas = document.getElementById('myChart'),
-    ctx = canvas.getContext('2d'),
-    startingData = {
-      labels: [1, 2, 3, 4, 5, 6, 7],
-      datasets: [
+    	ctx = canvas.getContext('2d'),
+    	startingData = {
+      	labels: [1, 2, 3, 4, 5, 6, 7],
+      	datasets: [
       		{
 				fillColor: "rgba(220,220,220,0.2)",
 				strokeColor: "rgba(220,220,220,1)",
@@ -66,10 +40,6 @@ $(function(){
 	var myLiveChart = new Chart(ctx).Line(startingData, {animationSteps: 15});
 
 
-	setInterval(function(){
-		getData();	  
-	}, 1000);
-
 	function getData(){
 		$.ajax({
 			url: "/all_settings",
@@ -77,21 +47,32 @@ $(function(){
 				console.log(result);
 				
 				// Add two random numbers for each dataset
-				myLiveChart.addData([result['current_humidity']], ++latestLabel);
+				//myLiveChart.addData([result['current_humidity']], ++latestLabel);
 				// Remove the first point so we dont just add values forever
-				myLiveChart.removeData();
+				//myLiveChart.removeData();
 
 				// Update the UI
-				$('#current_setting').html(result['current_humidity_setting']);
-				
+				//$('#current_setting').html(result['current_humidity_setting']);
+				//$('#current_humidity_reading').html(result['current_humidity']);
 				if(result['current_state'] == 'on')
 				{
-					onlineStatus.css('color', 'green');
+					onlineStatus.css('color', '#2ecc71');
+					onlineStatus.html('Connected');
 					onButton.hide()
 					offButton.show()
+
+					// Add two random numbers for each dataset
+					myLiveChart.addData([result['current_humidity']], ++latestLabel);
+					// Remove the first point so we dont just add values forever
+					myLiveChart.removeData();
+
+					// Update the UI
+					$('#current_setting').html(result['current_humidity_setting']);
+					$('#current_humidity_reading').html(result['current_humidity']);
 				}
 				else {
 					onlineStatus.css('color', 'red');
+					onlineStatus.html('Disconnected');
 					onButton.show()
 					offButton.hide()
 				}
@@ -103,28 +84,35 @@ $(function(){
 
 	onButton.on('click', function(){
 		// Send AJAX ON request
-
 		$.ajax({
 			url: "/user_state/on",
 			success: function(result){
 				console.log('Turning on');
 				console.log(result);
+				onButton.hide();
+				offButton.show();
+				intervalId = setInterval(function(){
+					getData();
+				}, 1000);
 			}
 		})
 	});
 
 	offButton.on('click', function(){
 		// Send AJAX OFF request
-
+		clearInterval(intervalId);
 		$.ajax({
 			url: "/user_state/off",
 			success: function(result){
 				console.log(result);
+				offButton.hide();
+				onButton.show();
 			}
 		})
 	});
 
 	setButton.on('click', function(){
+		
 		// Set the humidity to the desired setting
 		var url = "/change_humidity_setting/" + humidityAmount.val()
 		
