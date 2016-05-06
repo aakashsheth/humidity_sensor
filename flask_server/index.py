@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 import RPi.GPIO as GPIO
 import time
 import myDHT22
+import netifaces as ni
 
 import file_manager as files
 import publish_ip
@@ -9,7 +10,7 @@ import AutoHumidity
 
 # Begin automation logic script
 seconds_between_checks = 4
-AutoHumidity.begin_automation(seconds_between_checks)
+#AutoHumidity.begin_automation(seconds_between_checks)
 
 # GPIO Settings
 GPIO.setmode(GPIO.BCM)
@@ -175,15 +176,16 @@ def getAllSettings():
     hum = reading['humidity']
     to_show += "<br>Current Humidity:\t" + str(hum)
 
-    data = {
-        'status': 'success',
-        'current_state': state,
-        'current_user_state': user_state,
-        'current_humidity_setting': value,
-        'current_humidity': hum,
-    }
 
-    return str(data)
+    return jsonify(   
+        status = 'success',
+        current_state = state,
+        current_user_state = user_state,
+        current_humidity_setting = int(value),
+        current_humidity = int(float(hum)),
+        current_temp = 0,
+    )
+
 
 
 if __name__ == "__main__":

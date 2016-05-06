@@ -10,9 +10,9 @@ $(function(){
 	offButton.hide()
 	
 	// Get the data the firs time the server runs
-	
-		$.ajax({
-			url: "/data",
+	getData();
+		/*$.ajax({
+			url: "/all_settings",
 			success: function(result){
 				console.log(result);
 				
@@ -22,7 +22,7 @@ $(function(){
 				myLiveChart.removeData();
 
 				// Update the UI
-				$('#current_setting').html(result['current_setting']);
+				$('#current_setting').html(result['current_humidity_setting']);
 				$('#localIP').html(result['current_ip']);
 				if(result['current_status'] === 'ON')
 				{
@@ -38,7 +38,7 @@ $(function(){
 
 				//$('#localIP').html(result['ip']);
 			}
-		})
+		}) */
 	var canvas = document.getElementById('myChart'),
     ctx = canvas.getContext('2d'),
     startingData = {
@@ -68,11 +68,11 @@ $(function(){
 
 	setInterval(function(){
 		getData();	  
-	}, 1500);
+	}, 5000);
 
 	function getData(){
 		$.ajax({
-			url: "/data",
+			url: "/all_settings",
 			success: function(result){
 				console.log(result);
 				
@@ -82,7 +82,7 @@ $(function(){
 				myLiveChart.removeData();
 
 				// Update the UI
-				$('#current_setting').html(result['current_setting']);
+				$('#current_setting').html(result['current_humidity_setting']);
 				
 				if(result['current_status'] === 'ON')
 				{
@@ -96,7 +96,7 @@ $(function(){
 					offButton.hide()
 				}
 
-				//$('#localIP').html(result['ip']);
+				$('#localIP').html(result['current_ip']);
 			}
 		})
 	}
